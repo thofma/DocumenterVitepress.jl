@@ -739,13 +739,14 @@ end
 # TODO: list ordering is broken!
 function render(io::IO, mime::MIME"text/plain", node::Documenter.MarkdownAST.Node, list::MarkdownAST.List, page, doc; kwargs...)
     # @infiltrate
-    bullet = list.type === :ordered ? "1. " : "- "
+    k = 0
+    bullet() = list.type === :ordered ? "$(k+=1). " : "- "
     iob = IOBuffer()
     for item in node.children
         render(iob, mime, item, item.children, page, doc; prenewline = false, kwargs...)
         eachline = split(String(take!(iob)), '\n')
         eachline[2:end] .= "  " .* eachline[2:end]
-        print(io, bullet)
+        print(io, bullet())
         println.((io,), eachline)
     end
 end
